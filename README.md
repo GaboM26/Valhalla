@@ -3,7 +3,8 @@
 *Valhalla* – In Norse mythology, Valhalla, the hall of the slain warriors, was, symbolically,
 unbreachable. An invincible fortress, protected by Odin himself, where only the worthy made it
 inside. Heimdall kept an eye on all, and all warriors within would wait until judgement day, 
-or Ragnarok, when they would go defend the allfather. 
+or Ragnarok, when they would go defend the allfather. Essentially, valhalla would only
+be destroyed, and emptied, when Ragnarok came.
 
 This is the less poetic, more useful version. Valhalla is a Python project designed to 
 interact with a local MySQL database. It uses a master password, which is stored as a 
