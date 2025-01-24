@@ -40,3 +40,9 @@ aes is utilized as the encryption standard of choice.
 Run the unit tests to ensure everything is working correctly:
 ```sh
 python -m unittest discover tests
+```
+
+## Additional Features/Comments
+- convert_to_unix.sh is a simple shell script that will
+    recursively turn all files into unix typing. If this is not desired, 
+    then simply change dos2unix into unix2dos and run script.
