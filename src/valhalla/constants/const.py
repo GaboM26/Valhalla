@@ -1,1 +1,3 @@
 DEFAULT= "DEFAULT"
+DECRYPT = "dec"
+ENCRYPT = "enc"
