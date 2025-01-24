@@ -24,6 +24,10 @@ aes is utilized as the encryption standard of choice.
     ```sh
     pip install -r requirements.txt
     ```
+3. run following command to make sure your secrets are protected
+    ```sh
+    git update-index --assume-unchanged src/valhalla/config/secrets.yaml
+    ```
 
 ## Usage
 1. Set up your MySQL database and configure the connection settings.
