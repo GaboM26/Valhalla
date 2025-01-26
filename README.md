@@ -28,6 +28,10 @@ aes is utilized as the encryption standard of choice.
     ```sh
     git update-index --assume-unchanged src/valhalla/config/secrets.yaml
     ```
+    to undo this action (for any reason)
+    ```sh
+    git update-index --no-assume-unchanged src/valhalla/config/secrets.yaml
+    ```
 
 ## Usage
 1. Set up your MySQL database and configure the connection settings.
@@ -39,7 +43,7 @@ aes is utilized as the encryption standard of choice.
 ## Testing
 Run the unit tests to ensure everything is working correctly:
 ```sh
-python -m unittest discover tests
+python -m unittest discover tst
 ```
 
 ## Additional Features/Comments
