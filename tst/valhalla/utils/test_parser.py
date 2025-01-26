@@ -21,9 +21,18 @@ class TestValhallaConfigParser(unittest.TestCase):
         self.assertEqual(secrets['key'], 'value')
 
     def test_get_secrets_file_not_found(self):
-        parser = ValhallaConfigParser('non_existent_secrets.yaml')
         with self.assertRaises(FileNotFoundError):
-            parser.get_secrets()
+            parser = ValhallaConfigParser('non_existent_secrets.yaml')
+
+    def test_get_abs_path_file_exists(self):
+        parser = ValhallaConfigParser(self.test_secrets_path)
+        abs_path = parser.get_abs_path(self.test_secrets_path)
+        self.assertTrue(os.path.isabs(abs_path))
+        self.assertTrue(os.path.exists(abs_path))
+
+    def test_get_abs_path_file_not_found(self):
+        with self.assertRaises(FileNotFoundError):
+            parser = ValhallaConfigParser('non_existent_secrets.yaml')
 
 if __name__ == '__main__':
     unittest.main()

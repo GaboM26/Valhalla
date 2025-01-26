@@ -14,8 +14,6 @@ def main(argv):
     parser = ValhallaConfigParser(argv.secrets)
     driver = DriverClient(parser.get_secrets())
 
-    # Other Logic (secret retrieval, etc...)
-
     driver.run()
 
 if __name__ == "__main__":

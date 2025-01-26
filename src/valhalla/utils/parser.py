@@ -6,12 +6,19 @@ import os
 class ValhallaConfigParser:
 
     def __init__(self, secrets):
-        self.secrets_rel_path = secrets
+        if(not os.path.isabs(secrets)):
+            secrets = self.get_abs_path(secrets)
+
+        if not os.path.exists(secrets):
+            raise FileNotFoundError(f"Secrets file not found: {secrets}")
+
+        self.secrets_path = secrets
     
     def get_secrets(self) -> dict:
-        secrets_abs_path = os.path.abspath(self.secrets_rel_path)
-        if not os.path.exists(secrets_abs_path):
-            raise FileNotFoundError(f"Secrets file not found: {secrets_abs_path}")
-        with open(secrets_abs_path, 'r') as file:
+        with open(self.secrets_path, 'r') as file:
             config = yaml.safe_load(file)
         return config
+
+    def get_abs_path(self, rel_path):
+        secrets_abs_path = os.path.abspath(rel_path)
+        return secrets_abs_path
