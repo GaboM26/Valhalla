@@ -71,7 +71,20 @@ class PyMySqlClient:
         conn.close()
         
         return result
-   
+
+    def database_exists(self, database_name):
+        """
+        Check if a database exists.
+        :param database_name: Name of the database.
+        :return: True if the database exists, False otherwise.
+        """
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SHOW DATABASES LIKE %s", (database_name,))
+        result = cursor.fetchone()
+        conn.close()
+        return result is not None
+
     # There may be some security considerations here
     def insert_row_table(self, table_name, row_dict):
         """
