@@ -24,7 +24,9 @@ aes is utilized as the encryption standard of choice.
     ```sh
     pip install -r requirements.txt
     ```
-3. run following command to make sure your secrets are protected
+3. Update secrets.yaml file with your own personal configuration
+
+*Recommended:* run following command to make sure your secrets are protected
     ```sh
     git update-index --assume-unchanged src/valhalla/config/secrets.yaml
     ```
