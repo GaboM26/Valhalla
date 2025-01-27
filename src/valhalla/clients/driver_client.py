@@ -16,6 +16,8 @@ class DriverClient:
             self.execute_menu()
         except UnauthorizedUserError as e:
             print(f"Username/Password Incorrect")
+        except Exception as e: 
+            print(f"Unknown Exception occured: {e}")
     
     def validate_authorized_user(self):
         pass
