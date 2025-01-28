@@ -112,44 +112,33 @@ class PyMySqlClient:
             print("THERE WAS AN INTEGRITY ERROR", e)
             return 0
         return 1
-    
-    def retrieve(self, table_name, field_list, query_dict):
+
+    def retrieve(self, table_name, field_list = [], query_dict = {}):
         """
         Maps a query on a resource collection to an SQL statement and returns the result.
-    
+
         :param table_name: Name of the table.
         :param field_list: List of columns to return.
         :param query_dict: Dictionary of name, value pairs to form a where clause.
         :return: The result set as a list of dictionaries.
         """
-    
-        #Builds select statement
-        sql = "SELECT\n "
-    
-        #Returns all columns if field_list is empty
-        if(len(field_list) == 0):
-            field_list.append('*')
-    
-        for col in field_list:
-            sql += col + ",\n "
-        sql = sql[0:len(sql)-3]
-    
-        #Builds from statement.
-        sql += '\nFROM ' + self._database + '.' + table_name
-    
-        args =[]
-        #runs query withour WHERE if no dictionary is provided
-        if(len(query_dict) == 0):
-            return self.run_query(sql, args)
-    
-        #builds where statement
-        sql += '\nWHERE\n'
-    
-        for col, val in query_dict.items():
-            sql += " "+col + "=%s \n AND"
-            args.append(val)
-        
-        sql = sql[0:len(sql)-5]
+
+        # Ensure field_list is not empty
+        if not field_list:
+            field_list = ['*']
+
+        # Build the SELECT statement
+        sql = "SELECT " + ", ".join(field_list) + f" FROM {self._database}.{table_name}"
+        args = []
+
+        # Build the WHERE clause if query_dict is provided
+        if query_dict:
+            where_clauses = []
+            for col, val in query_dict.items():
+                where_clauses.append(f"{col} = %s")
+                args.append(val)
+            sql += " WHERE " + " AND ".join(where_clauses)
+
         return self.run_query(sql, args)
 
     def build_where_clause_pk(self, table_name:str, vals:dict):
