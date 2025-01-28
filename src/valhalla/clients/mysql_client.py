@@ -72,7 +72,7 @@ class PyMySqlClient:
         
         return result
 
-    def database_exists(self, database_name):
+    def database_exists(self):
         """
         Check if a database exists.
         :param database_name: Name of the database.
@@ -80,7 +80,7 @@ class PyMySqlClient:
         """
         conn = self._get_connection()
         cursor = conn.cursor()
-        cursor.execute("SHOW DATABASES LIKE %s", (database_name,))
+        cursor.execute("SHOW DATABASES LIKE %s", (self._database))
         result = cursor.fetchone()
         conn.close()
         return result is not None
@@ -254,3 +254,9 @@ class PyMySqlClient:
             self.run_query(sql_query, pk_vals, fetch=False)
         except Exception as e:
             raise Exception("delete query failed", e)
+    
+    def change_db(self, database):
+        self._database = database
+
+    def get_db(self):
+        return self._database

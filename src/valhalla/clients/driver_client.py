@@ -9,11 +9,11 @@ class DriverClient:
 
     def run(self):
         if(not self.sqlClient.database_exists()):
-            raise ValueError(f"Database '{self.sqlClient._database}' does not exist.")
+            raise ValueError(f"Database '{self.sqlClient.get_db()}' does not exist.")
         
         try: 
             self.validate_authorized_user()
-            self.execute_menu()
+            self.display_menu()
         except UnauthorizedUserError as e:
             print(f"Username/Password Incorrect")
         except Exception as e: 

@@ -45,7 +45,7 @@ aes is utilized as the encryption standard of choice.
 ## Testing
 Run the unit tests to ensure everything is working correctly:
 ```sh
-python -m unittest discover tst
+python3 -m unittest discover tst
 ```
 
 ## Additional Features/Comments
