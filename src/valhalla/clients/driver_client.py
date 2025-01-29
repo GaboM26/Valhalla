@@ -56,8 +56,6 @@ class DriverClient:
 
         return usr, ps
 
-        # if(self.crypto_tools.hash_diff(ps, ret[0]))
-
 
 
     def get_user_credentials(self):
