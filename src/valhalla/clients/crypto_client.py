@@ -34,7 +34,7 @@ class CryptoClient:
             return True
     
     #TODO: Will add additional config in secrets defining true Odin user (db admin)
-    def is_odin(self):
+    def is_odin(self, username):
         return True
 
     def encrypt(self, password, txt):

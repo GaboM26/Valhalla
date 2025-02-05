@@ -44,7 +44,7 @@ class DriverClient:
     
     def welcome_message(self):
         msg = f'Welcome {self._username}'
-        if(self._crypto_tools.is_odin()):
+        if(self._crypto_tools.is_odin(self._username)):
             return msg + ', true Odin'
         #TODO: admin benefits could be awarded 
         return msg + ', trusted Einherjar. What can Valhalla give you today?'
@@ -62,7 +62,6 @@ class DriverClient:
         
 
         return usr, ps
-
 
 
     def get_user_credentials(self):
