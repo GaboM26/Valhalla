@@ -15,7 +15,7 @@ class DriverClient:
     def __init__(self, secrets):
         self.sqlClient = PyMySqlClient(secrets['database_user'], secrets['database_password'],
                                   secrets['host'], secrets['database'])
-        self.crypto_tools = CryptoClient()
+        self.crypto_tools = CryptoClient(secrets['crypto_specs'])
         self._username = None
         self._password = None
 

@@ -7,6 +7,9 @@ from src.valhalla.clients.crypto_client import CryptoClient
 
 class TestCryptoClient(unittest.TestCase):
 
+    def setUp(self):
+        return super().setUp()
+
     @patch.object(CryptoClient, 'hash', return_value='hashed_password')
     def test_hash(self, mock_hash):
         assert True
