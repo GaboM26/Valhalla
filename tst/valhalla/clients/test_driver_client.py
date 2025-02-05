@@ -21,13 +21,17 @@ class TestDriverClient(unittest.TestCase):
             'database_user': 'user',
             'database_password': 'password',
             'host': 'localhost',
-            'database': 'test_db'
+            'database': 'test_db',
+            'crypto_specs': {
+                'odin_password': 'odin'
+            }
         }
         self.client = DriverClient(self.secrets)
         self.client.crypto_tools.hash_diff = MagicMock()
 
     @patch.object(PyMySqlClient, 'database_exists', return_value=False)
     def test_run_database_does_not_exist(self, mock_database_exists):
+        print('not exist')
         with self.assertRaises(ValueError) as context:
             self.client.run()
         self.assertEqual(str(context.exception), "Database 'test_db' does not exist.")
@@ -37,6 +41,7 @@ class TestDriverClient(unittest.TestCase):
     @patch.object(DriverClient, 'display_menu')
     @patch.object(PyMySqlClient, 'database_exists', return_value=True)
     def test_run_success(self, mock_database_exists, mock_validate_authorized_user, mock_display_menu):
+        print('success')
         self.client.run()
         mock_validate_authorized_user.assert_called_once()
         mock_display_menu.assert_called_once()
@@ -45,6 +50,7 @@ class TestDriverClient(unittest.TestCase):
     @patch.object(DriverClient, 'validate_authorized_user', side_effect=UnauthorizedUserError)
     @patch.object(PyMySqlClient, 'database_exists', return_value=True)
     def test_run_unauthorized_user_error(self, mock_database_exists, mock_validate_authorized_user):
+        print('unauth')
         with patch('sys.exit') as mock_exit:
             self.client.run()
             self.assertEqual(mock_validate_authorized_user.call_count, MAX_RETRIES_ALLOWED)

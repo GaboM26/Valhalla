@@ -27,7 +27,6 @@ class DriverClient:
         
         while retry_count < MAX_RETRIES_ALLOWED:
             try: 
-
                 self._username, self._password = self.validate_authorized_user()
                 break
             except UnauthorizedUserError as e:
