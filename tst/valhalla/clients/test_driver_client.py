@@ -15,8 +15,8 @@ class TestDriverClient(unittest.TestCase):
     @patch('src.valhalla.clients.mysql_client.PyMySqlClient')
     @patch('src.valhalla.clients.crypto_client.CryptoClient')
     def setUp(self, MockPyMySqlClient, MockCryptoClient):
-        self.mock_sql_client = MockPyMySqlClient.return_value
-        self.mock_crypto_tools = MockCryptoClient.return_value
+        self.mock__sql_client = MockPyMySqlClient.return_value
+        self.mock__crypto_tools = MockCryptoClient.return_value
         self.secrets = {
             'database_user': 'user',
             'database_password': 'password',
@@ -27,7 +27,7 @@ class TestDriverClient(unittest.TestCase):
             }
         }
         self.client = DriverClient(self.secrets)
-        self.client.crypto_tools.hash_diff = MagicMock()
+        self.client._crypto_tools.hash_diff = MagicMock()
 
     @patch.object(PyMySqlClient, 'database_exists', return_value=False)
     def test_run_database_does_not_exist(self, mock_database_exists):
@@ -56,13 +56,13 @@ class TestDriverClient(unittest.TestCase):
     @patch.object(DriverClient, 'get_user_credentials', return_value=('user', 'password'))
     @patch.object(PyMySqlClient, 'retrieve', return_value=[{HASHED_MASTER_PASSWORD_FIELD_NAME: 'hashed_password'}])
     def test_validate_authorized_user_success(self, mock_retrieve, mock_get_user_credentials):
-        self.client.crypto_tools.hash_diff.return_value = False
+        self.client._crypto_tools.hash_diff.return_value = False
         usr, ps = self.client.validate_authorized_user()
         self.assertEqual(usr, 'user')
         self.assertEqual(ps, 'password')
         mock_get_user_credentials.assert_called_once()
         mock_retrieve.assert_called_once_with(MASTER_TABLE_NAME, [HASHED_MASTER_PASSWORD_FIELD_NAME], {MASTER_FIELD_NAME: 'user'})
-        self.client.crypto_tools.hash_diff.assert_called_once_with('password', 'hashed_password')
+        self.client._crypto_tools.hash_diff.assert_called_once_with('password', 'hashed_password')
 
     @patch.object(DriverClient, 'get_user_credentials', return_value=('user', 'password'))
     @patch.object(PyMySqlClient, 'retrieve', return_value=[])
@@ -79,7 +79,7 @@ class TestDriverClient(unittest.TestCase):
             self.client.validate_authorized_user()
         mock_get_user_credentials.assert_called_once()
         mock_retrieve.assert_called_once_with(MASTER_TABLE_NAME, [HASHED_MASTER_PASSWORD_FIELD_NAME], {MASTER_FIELD_NAME: 'user'})
-        self.client.crypto_tools.hash_diff.assert_called_once_with('password', 'hashed_password')
+        self.client._crypto_tools.hash_diff.assert_called_once_with('password', 'hashed_password')
 
 if __name__ == '__main__':
     unittest.main()

@@ -32,6 +32,10 @@ class CryptoClient:
         except subprocess.CalledProcessError as e:
             # Hash function returned an error (hashes did not match)
             return True
+    
+    #TODO: Will add additional config in secrets defining true Odin user (db admin)
+    def is_odin(self):
+        return True
 
     def encrypt(self, password, txt):
         pass

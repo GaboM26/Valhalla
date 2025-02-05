@@ -13,15 +13,15 @@ import sys
 class DriverClient:
 
     def __init__(self, secrets):
-        self.sqlClient = PyMySqlClient(secrets['database_user'], secrets['database_password'],
+        self._sqlClient = PyMySqlClient(secrets['database_user'], secrets['database_password'],
                                   secrets['host'], secrets['database'])
-        self.crypto_tools = CryptoClient(secrets['crypto_specs'])
+        self._crypto_tools = CryptoClient(secrets['crypto_specs'])
         self._username = None
         self._password = None
 
     def run(self):
-        if(not self.sqlClient.database_exists()):
-            raise ValueError(f"Database '{self.sqlClient.get_db()}' does not exist.")
+        if(not self._sqlClient.database_exists()):
+            raise ValueError(f"Database '{self._sqlClient.get_db()}' does not exist.")
         
         retry_count = 0
         
@@ -37,9 +37,17 @@ class DriverClient:
             print("Too many retries. Attempts logged. Contact DB Administrator to unblock")
             # TODO: Should keep these in a table to keep a log of unauthorized access attempts
             sys.exit()
+        
+        print(self.welcome_message())
 
         self.display_menu()
-
+    
+    def welcome_message(self):
+        msg = f'Welcome {self._username}'
+        if(self._crypto_tools.is_odin()):
+            return msg + ', true Odin'
+        #TODO: admin benefits could be awarded 
+        return msg + ', trusted Einherjar. What can Valhalla give you today?'
     
     def validate_authorized_user(self):
         usr, ps = self.get_user_credentials()
@@ -47,9 +55,9 @@ class DriverClient:
         filter_map = {
             MASTER_FIELD_NAME: usr
         }
-        ret = self.sqlClient.retrieve(MASTER_TABLE_NAME, get_list, filter_map)
+        ret = self._sqlClient.retrieve(MASTER_TABLE_NAME, get_list, filter_map)
 
-        if(len(ret) != 1 or self.crypto_tools.hash_diff(ps, ret[0]['password'])):
+        if(len(ret) != 1 or self._crypto_tools.hash_diff(ps, ret[0]['password'])):
             raise UnauthorizedUserError("Unauthorized User. Blocking")
         
 
