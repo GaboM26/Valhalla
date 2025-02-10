@@ -2,6 +2,7 @@ import unittest
 from src.valhalla.main import main
 from unittest.mock import patch, MagicMock
 from pymysql.err import OperationalError
+from src.valhalla.utils.exceptions.unauthorized_user_error import UnauthorizedUserError
 
 class TstNamespace:
         
@@ -47,13 +48,36 @@ class TestMain(unittest.TestCase):
 
         # Capture the output
         with self.assertLogs(level='ERROR') as log:
-            with self.assertRaises(SystemExit):  # Assuming main exits on error
-                args = TstNamespace(secrets='TEST')
-                main(args)
+            args = TstNamespace(secrets='TEST')
+            retval = main(args)
+            self.assertEqual(retval, -1)
 
         # Check that the error message was logged
         self.assertIn("OperationalError", log.output[0])
+        @patch('src.valhalla.main.DriverClient')
+        @patch('src.valhalla.main.ValhallaConfigParser')
+        def test_unauthorized_user_error_handling(self, MockValhallaConfigParser, MockDriverClient):
+            # Mock the ValhallaConfigParser to return a mock secrets dictionary
+            mock_parser_instance = MockValhallaConfigParser.return_value
+            mock_parser_instance.get_secrets.return_value = {
+                'database_user': 'user',
+                'database_password': 'password',
+                'host': 'localhost',
+                'database': 'test_db'
+            }
 
+            # Mock the DriverClient to raise an UnauthorizedUserError when run is called
+            mock_driver_instance = MockDriverClient.return_value
+            mock_driver_instance.run.side_effect = UnauthorizedUserError
+
+            # Capture the output
+            with self.assertLogs(level='ERROR') as log:
+                with self.assertRaises(SystemExit):  # Assuming main exits on error
+                    args = TstNamespace(secrets='TEST')
+                    main(args)
+
+            # Check that the error message was logged
+            self.assertIn("UnauthorizedUserError", log.output[0])
     
 
 

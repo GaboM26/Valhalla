@@ -23,6 +23,7 @@ class TestDriverClient(unittest.TestCase):
             'host': 'localhost',
             'database': 'test_db',
             'crypto_specs': {
+                'odin_username': 'odin',
                 'odin_password': 'odin'
             }
         }
@@ -36,28 +37,26 @@ class TestDriverClient(unittest.TestCase):
         self.assertEqual(str(context.exception), "Database 'test_db' does not exist.")
         mock_database_exists.assert_called_once()
 
-    @patch.object(DriverClient, 'validate_authorized_user', return_value=('user', 'password'))
-    @patch.object(DriverClient, 'display_menu')
+    @patch.object(DriverClient, 'validate_input', return_value=('user', 'password'))
     @patch.object(PyMySqlClient, 'database_exists', return_value=True)
-    def test_run_success(self, mock_database_exists, mock_validate_authorized_user, mock_display_menu):
+    def test_run_success(self, mock_database_exists, mock_validate_input):
         self.client.run()
-        mock_validate_authorized_user.assert_called_once()
-        mock_display_menu.assert_called_once()
+        mock_validate_input.assert_called_once()
         mock_database_exists.assert_called_once()
 
-    @patch.object(DriverClient, 'validate_authorized_user', side_effect=UnauthorizedUserError)
+    @patch.object(DriverClient, 'validate_input', side_effect=UnauthorizedUserError)
     @patch.object(PyMySqlClient, 'database_exists', return_value=True)
-    def test_run_unauthorized_user_error(self, mock_database_exists, mock_validate_authorized_user):
+    def test_run_unauthorized_user_error(self, mock_database_exists, mock_validate_input):
         with patch('sys.exit') as mock_exit:
             self.client.run()
-            self.assertEqual(mock_validate_authorized_user.call_count, MAX_RETRIES_ALLOWED)
+            self.assertEqual(mock_validate_input.call_count, MAX_RETRIES_ALLOWED)
             mock_exit.assert_called_once()
 
     @patch.object(DriverClient, 'get_user_credentials', return_value=('user', 'password'))
     @patch.object(PyMySqlClient, 'retrieve', return_value=[{HASHED_MASTER_PASSWORD_FIELD_NAME: 'hashed_password'}])
     def test_validate_authorized_user_success(self, mock_retrieve, mock_get_user_credentials):
         self.client._crypto_tools.hash_diff.return_value = False
-        usr, ps = self.client.validate_authorized_user()
+        usr, ps = self.client.validate_input()
         self.assertEqual(usr, 'user')
         self.assertEqual(ps, 'password')
         mock_get_user_credentials.assert_called_once()
@@ -68,7 +67,7 @@ class TestDriverClient(unittest.TestCase):
     @patch.object(PyMySqlClient, 'retrieve', return_value=[])
     def test_validate_authorized_user_no_user_found(self, mock_retrieve, mock_get_user_credentials):
         with self.assertRaises(UnauthorizedUserError):
-            self.client.validate_authorized_user()
+            self.client.validate_input()
         mock_get_user_credentials.assert_called_once()
         mock_retrieve.assert_called_once_with(MASTER_TABLE_NAME, [HASHED_MASTER_PASSWORD_FIELD_NAME], {MASTER_FIELD_NAME: 'user'})
 
@@ -76,10 +75,18 @@ class TestDriverClient(unittest.TestCase):
     @patch.object(PyMySqlClient, 'retrieve', return_value=[{HASHED_MASTER_PASSWORD_FIELD_NAME: 'hashed_password'}])
     def test_validate_authorized_user_hash_diff(self, mock_retrieve, mock_get_user_credentials):
         with self.assertRaises(UnauthorizedUserError):
-            self.client.validate_authorized_user()
+            self.client.validate_input()
         mock_get_user_credentials.assert_called_once()
         mock_retrieve.assert_called_once_with(MASTER_TABLE_NAME, [HASHED_MASTER_PASSWORD_FIELD_NAME], {MASTER_FIELD_NAME: 'user'})
         self.client._crypto_tools.hash_diff.assert_called_once_with('password', 'hashed_password')
+
+    @patch.object(DriverClient, 'get_authorized_creds', return_value=None)
+    @patch.object(PyMySqlClient, 'database_exists', return_value=True)
+    def test_run_unauthorized_user_error(self, mock_database_exists, mock_get_authorized_creds):
+        with self.assertRaises(UnauthorizedUserError):
+            self.client.run()
+        mock_database_exists.assert_called_once()
+        mock_get_authorized_creds.assert_called_once()
 
 if __name__ == '__main__':
     unittest.main()

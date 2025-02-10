@@ -11,11 +11,12 @@ import subprocess
 class CryptoClient:
 
     def __init__(self, configs:dict):
-        self._odin = configs['odin_password']
+        self._odin_user = configs['odin_username']
+        self._odin_pass = configs['odin_password']
 
     def hash(self, raw_password):
         try:
-            result = subprocess.run(['bin/hmac', '-h', '-p', self._odin, raw_password], capture_output=True, text=True, check=True)
+            result = subprocess.run(['bin/hmac', '-h', '-p', self._odin_pass, raw_password], capture_output=True, text=True, check=True)
             print(result)
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
@@ -24,7 +25,7 @@ class CryptoClient:
 
     def hash_diff(self, raw_password, hashed_password):
         try:
-            result = subprocess.run(['bin/hmac', '-h', raw_password, '-p', self._odin, '-v', hashed_password], capture_output=True, text=True, check=True)
+            result = subprocess.run(['bin/hmac', '-h', raw_password, '-p', self._odin_pass, '-v', hashed_password], capture_output=True, text=True, check=True)
             stripped_result = result.stdout.strip()
             if(stripped_result== 'Hashes match.'):
                 return False
@@ -33,9 +34,8 @@ class CryptoClient:
             # Hash function returned an error (hashes did not match)
             return True
     
-    #TODO: Will add additional config in secrets defining true Odin user (db admin)
     def is_odin(self, username):
-        return True
+        return self._odin_user == username
 
     def encrypt(self, password, txt):
         pass

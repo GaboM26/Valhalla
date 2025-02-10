@@ -9,7 +9,10 @@ import subprocess
 class TestCryptoClient(unittest.TestCase):
 
     def setUp(self):
-        self.configs = {'odin_password': 'secret'}
+        self.configs = {
+            'odin_username':'odin',
+            'odin_password': 'secret'
+        }
         self.client = CryptoClient(self.configs)
 
     @patch('subprocess.run')
