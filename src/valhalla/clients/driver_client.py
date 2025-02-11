@@ -29,7 +29,9 @@ class DriverClient:
             raise UnauthorizedUserError
         
         # We know user is authenticated
-        menu = MenuClient(auth_user_credentials)
+        # TODO: potentially, when use cases grow we could use some kind of injector here that chooses different
+        # super class "helper_client" instances
+        menu = MenuClient(auth_user_credentials, self._sqlClient, self._crypto_tools)
         menu.run()
     
     def get_authorized_creds(self):
@@ -41,7 +43,6 @@ class DriverClient:
             except UnauthorizedUserError as e:
                 print(f"Username/Password Incorrect - {e}")
         return None
-        
     
     def validate_input(self):
         usr, ps = self.get_user_credentials()
@@ -56,7 +57,6 @@ class DriverClient:
         
 
         return usr, ps
-
 
     def get_user_credentials(self):
         """
