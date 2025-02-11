@@ -4,6 +4,7 @@ from src.valhalla.clients.driver_client import DriverClient
 from src.valhalla.utils.exceptions.unauthorized_user_error import UnauthorizedUserError
 from src.valhalla.clients.mysql_client import PyMySqlClient
 from src.valhalla.clients.crypto_client import CryptoClient
+from src.valhalla.clients.menu_client import MenuClient
 from src.valhalla.constants.const import (
     MAX_RETRIES_ALLOWED,
     MASTER_TABLE_NAME,
@@ -14,7 +15,8 @@ class TestDriverClient(unittest.TestCase):
 
     @patch('src.valhalla.clients.mysql_client.PyMySqlClient')
     @patch('src.valhalla.clients.crypto_client.CryptoClient')
-    def setUp(self, MockPyMySqlClient, MockCryptoClient):
+    @patch('src.valhalla.clients.menu_client.MenuClient.run', return_value=None)
+    def setUp(self, MockPyMySqlClient, MockCryptoClient, MockMenuClientRun):
         self.mock__sql_client = MockPyMySqlClient.return_value
         self.mock__crypto_tools = MockCryptoClient.return_value
         self.secrets = {
@@ -39,7 +41,8 @@ class TestDriverClient(unittest.TestCase):
 
     @patch.object(DriverClient, 'validate_input', return_value=('user', 'password'))
     @patch.object(PyMySqlClient, 'database_exists', return_value=True)
-    def test_run_success(self, mock_database_exists, mock_validate_input):
+    @patch('src.valhalla.clients.menu_client.MenuClient.run', return_value=None)
+    def test_run_success(self, mock_database_exists, mock_validate_input, mock_menu_client_run):
         self.client.run()
         mock_validate_input.assert_called_once()
         mock_database_exists.assert_called_once()
