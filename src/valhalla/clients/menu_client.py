@@ -1,4 +1,13 @@
-from src.valhalla.constants.menu_options import SUPPORTED_OPTIONS
+from time import sleep
+from src.valhalla.constants.menu_options import (
+    SUPPORTED_OPTIONS,
+    NUM_POINTS,
+    SUSPENSE_CREATOR_AMOUNT,
+    STARLINE,
+    VALHALLA_BANNER,
+    VALHALLA_CREDITS,
+    ODIN_PERMISSIONS
+)
 
 class MenuClient:
 
@@ -13,14 +22,14 @@ class MenuClient:
             self.display_menu()
             choice = input("Enter your choice: ")
             if choice == 'q':
+                print('')
                 break
             self.execute_option(choice)
 
     def display_menu(self):
-        print("Menu:")
+        print(STARLINE)
         for key, value in SUPPORTED_OPTIONS.items():
             print(f"{key}: {value[1]}")
-        print("q: Quit")
 
     def execute_option(self, choice):
         try:
@@ -35,9 +44,17 @@ class MenuClient:
 
     def view_entries(self):
         print("Executing view_entries method")
-
+    
     def welcome_message(self):
-        msg = f'Welcome {self._username}'
+        msg = f'Welcome {self._username} to'
+        print(msg, end='', flush=True)
+        for i in range(NUM_POINTS):
+            print('.', end='', flush=True)
+            sleep(SUSPENSE_CREATOR_AMOUNT)
+        print('')
+        print(STARLINE)
+        print(VALHALLA_BANNER)
+        print(VALHALLA_CREDITS)
+
         if self._crypto_tools.is_odin(self._username):
-            return msg + ', Odin permissions granted'
-        return msg + ', Einherjar. What can Valhalla give you today?'
+            print(ODIN_PERMISSIONS)
