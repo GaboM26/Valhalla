@@ -1,0 +1,3 @@
+[submodule "src/Honir"]
+	path = src/Honir
+	url = git@github.com:GaboM26/Honir.git
