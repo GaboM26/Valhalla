@@ -15,8 +15,9 @@ class TestDriverClient(unittest.TestCase):
 
     @patch('src.valhalla.clients.mysql_client.PyMySqlClient')
     @patch('src.valhalla.clients.crypto_client.CryptoClient')
+    @patch('src.valhalla.clients.crypto_client.CryptoClient.prepare_tools', return_value=None)
     @patch('src.valhalla.clients.menu_client.MenuClient.run', return_value=None)
-    def setUp(self, MockPyMySqlClient, MockCryptoClient, MockMenuClientRun):
+    def setUp(self, MockPyMySqlClient, MockCryptoClient, MockPrepareTools, MockMenuClientRun):
         self.mock__sql_client = MockPyMySqlClient.return_value
         self.mock__crypto_tools = MockCryptoClient.return_value
         self.secrets = {
@@ -29,7 +30,8 @@ class TestDriverClient(unittest.TestCase):
                 'odin_password': 'odin'
             }
         }
-        self.client = DriverClient(self.secrets)
+        self.project_root = '/mock/project/root'
+        self.client = DriverClient(self.secrets, self.project_root)
         self.client._crypto_tools.hash_diff = MagicMock()
 
     @patch.object(PyMySqlClient, 'database_exists', return_value=False)

@@ -20,11 +20,13 @@ class TestMain(unittest.TestCase):
         mock_driver_instance = MockDriverClient.return_value
         
         args = TstNamespace(secrets='TEST')
-        main(args)
+        project_root = '/mock/project/root'  # Mock project root
+        with patch('src.valhalla.main.project_root', project_root):
+            main(args)
         
         MockValhallaConfigParser.assert_called_once_with('TEST')
         mock_parser_instance.get_secrets.assert_called_once()
-        MockDriverClient.assert_called_once_with('mock_secrets')
+        MockDriverClient.assert_called_once_with('mock_secrets', project_root)
         mock_driver_instance.run.assert_called_once()
 
         if __name__ == "__main__":

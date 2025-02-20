@@ -9,14 +9,13 @@ from src.valhalla.constants.const import (
 )
 from src.valhalla.clients.crypto_client import CryptoClient
 from src.valhalla.clients.menu_client import MenuClient
-import sys
 
 class DriverClient:
 
-    def __init__(self, secrets):
+    def __init__(self, secrets, project_root):
         self._sqlClient = PyMySqlClient(secrets['database_user'], secrets['database_password'],
                                   secrets['host'], secrets['database'])
-        self._crypto_tools = CryptoClient(secrets['crypto_specs'])
+        self._crypto_tools = CryptoClient(secrets['crypto_specs'], project_root)
 
     def run(self):
         if(not self._sqlClient.database_exists()):
