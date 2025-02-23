@@ -83,6 +83,7 @@ class CryptoClient:
         #Run make in Honir submodule
         try:
             #Will clean executables, compile them, and run unit tests for them
+            print(honir_path)
             compile = subprocess.run(['make', 'all'], cwd=honir_path, capture_output=True, text=True, check=True)
         except subprocess.CalledProcessError as e:
             print(f"Error during compilation: {e.stderr}", file=sys.stderr)

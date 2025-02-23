@@ -10,7 +10,7 @@ MASTER_FIELD_NAME = 'username'
 HASHED_MASTER_PASSWORD_FIELD_NAME = 'password'
 
 # Honir automatization
-HONIR_REL_PATH = ''
+HONIR_REL_PATH = 'src/Honir'
 CRYPTO_TOOLS_PATH = "bin/"
 HASHER = 'hmac'
 ENCRYPTOR = 'aes-encrypt'
