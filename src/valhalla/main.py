@@ -28,8 +28,8 @@ def main(argv):
         logging.error(f"UnauthorizedUserError: {e}")
         print("Too many retries. Attempts logged. Contact DB Administrator to unblock")
     except MissingDependenciesError as e:
-        logging.error(f"UnauthorizedUserError: {e}")
-        print("Too many retries. Attempts logged. Contact DB Administrator to unblock")
+        logging.error(f"MissingDependenciesError: {e}")
+        print("Something went wrong. Contact DB Administrator to unblock")
     finally:
         retval = -1
     

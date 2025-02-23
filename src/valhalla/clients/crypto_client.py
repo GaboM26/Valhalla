@@ -91,6 +91,7 @@ class CryptoClient:
 
         # Move required tools to the bin folder
         try:
+            self.ensure_directory_exists(self._tools_path)
             for tool in AVAILABLE_CRYPTO_TOOLS:
                 shutil.move(os.path.join(honir_path, tool), os.path.join(self._tools_path, tool))
         except Exception as e:
@@ -103,3 +104,9 @@ class CryptoClient:
                 return False
         return True
     
+    def ensure_directory_exists(self, directory_path):
+        if not os.path.exists(directory_path):
+            os.makedirs(directory_path)
+            print(f"Directory created: {directory_path}")
+        else:
+            print(f"Directory already exists: {directory_path}")
