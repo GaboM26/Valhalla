@@ -22,7 +22,6 @@ class MenuClient:
             self.display_menu()
             choice = input("Enter your choice: ")
             if choice == 'q':
-                print('')
                 break
             self.execute_option(choice)
 
@@ -42,8 +41,11 @@ class MenuClient:
     def new_entry(self):
         print("Executing new_entry method")
 
-    def view_entries(self):
-        print("Executing view_entries method")
+    def view_accounts(self):
+        print("Executing view_accounts method")
+    
+    def get_entry(self):
+        print("Executing get_entry method")
     
     def welcome_message(self):
         msg = f'Welcome {self._username} to'
