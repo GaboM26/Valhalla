@@ -35,7 +35,7 @@ class CryptoClient:
             result = subprocess.run([hash_cmd, '-h', '-p', self._odin_pass, raw_password],
                                     cwd=self._tools_path,
                                     capture_output=True,
-                                    text=True, 
+                                    text=False, 
                                     check=True
                                 )
             print(result)
@@ -64,11 +64,35 @@ class CryptoClient:
     def is_odin(self, username):
         return self._odin_user == username
 
-    def encrypt(self, password, txt):
-        pass
+    def encrypt(self, password:str, plaintext:str) -> int:
+        try:
+            encrypt_cmd_path = os.path.join('.', ENCRYPTOR)
+            ciphertext = subprocess.run([encrypt_cmd_path, '-i', plaintext, 'stdout', '-p', password], 
+                                    cwd=self._tools_path,
+                                    capture_output=True, 
+                                    text=False, 
+                                    check=True
+                                )
+        except RuntimeError as e:
+            print(f"Error executing encrypt: {e}", file=sys.stderr)
+            return None
+        return int.from_bytes(ciphertext.stdout, 'little')
 
-    def decrypt(self, password, txt):
+    def decrypt(self, password:str, ciphertext:str):
         pass
+        # try:
+        #     decrypt_cmd_path = os.path.join('.', ENCRYPTOR)
+        #     print(decrypt_cmd_path)
+        #     plaintext = subprocess.run([decrypt_cmd_path, '-i', ciphertext, 'stdout', '-p', password], 
+        #                             cwd=self._tools_path,
+        #                             capture_output=True, 
+        #                             text=True, 
+        #                             check=True
+        #                         )
+        # except RuntimeError as e:
+        #     print(f"Error executing decrypt: {e}", file=sys.stderr)
+        #     return None
+#        return plaintext.stdout
 
     def prepare_tools(self, project_root):
         honir_path = os.path.join(project_root, HONIR_REL_PATH)

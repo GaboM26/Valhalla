@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from src.valhalla.clients.crypto_client import CryptoClient
 import subprocess
+import os
 
 # FILE: src/valhalla/clients/test_crypto_client.py
 
@@ -14,7 +15,7 @@ class TestCryptoClient(unittest.TestCase):
             'odin_username':'odin',
             'odin_password': 'secret'
         }
-        self.project_root = '/mock/project/root'
+        self.project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
         self.client = CryptoClient(self.configs, self.project_root)
         self.raw_password = 'password123'
 
@@ -26,7 +27,7 @@ class TestCryptoClient(unittest.TestCase):
         mock_subprocess_run.assert_called_once_with(['./hmac', '-h', '-p', 'secret', self.raw_password],
                                                     cwd=self.client._tools_path,
                                                     capture_output=True,
-                                                    text=True, 
+                                                    text=False, 
                                                     check=True)
         self.assertEqual(result, 'hashed_password')
 
@@ -67,6 +68,13 @@ class TestCryptoClient(unittest.TestCase):
                                                     text=True, 
                                                     check=True)
         self.assertTrue(result)
+
+    
+    def test_encrypt_returns_bytes(self):
+        plaintext = 'test'
+        ciphertext = self.client.encrypt('password', plaintext)
+        self.assertIsInstance(ciphertext, int)
+
 
 if __name__ == "__main__":
     unittest.main()
