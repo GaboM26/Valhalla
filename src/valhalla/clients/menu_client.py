@@ -54,16 +54,22 @@ class MenuClient:
         app_name_enc = self._crypto_tools.encrypt(self._password, app_name)
         username_enc = self._crypto_tools.encrypt(self._password, username)
         password_enc = self._crypto_tools.encrypt(self._password, password)
-        
-        self._sql_client.insert_row_table(SECRETS_TABLE_NAME, 
-                                          self._payload_builder.build(SECRETS_TABLE_NAME)(app_name_enc, 
-                                                                                          username_enc, 
-                                                                                          password_enc,
-                                                                                          self._username))
+
+        payload = self._payload_builder \
+                        .build(SECRETS_TABLE_NAME)(
+                            app_name_enc, 
+                            username_enc, 
+                            password_enc,
+                            self._username
+                        )
+
+        self._sql_client.insert_row_table(SECRETS_TABLE_NAME, payload)
         print("New entry added successfully")
 
     def view_accounts(self):
-        print("Executing view_accounts method")
+        print("Viewed accounts successfully")
+        # self._sql_client.retrieve(SECRETS_TABLE_NAME,
+        #                          self._payload_builder.build(SECRETS_TABLE_NAME))
     
     def get_entry(self):
         print("Executing get_entry method")
