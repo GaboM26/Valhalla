@@ -94,20 +94,17 @@ class PyMySqlClient:
         :return: 1 of the insert occurred and 0 otherwise.
         """
 
-        sql = f"INSERT INTO {self._database}.{table_name} ("
-        vls = "("
+        columns = []
+        placeholders = []
         values = []
         for col, val in row_dict.items():
-            if(val != None and len(val) > 0):
-                sql += col + ', '
-                vls += "%s, "
-                values.append(str(val))
-        sql = sql[0:len(sql)-2]
-        sql += ")"
-        vls = vls[0:len(vls)-2]
-        sql += " VALUES " + vls + ");"
+            if val is not None and (not isinstance(val, str) or len(val) > 0):
+                columns.append(col)
+                placeholders.append("%s")
+                values.append(val)
+        sql = f"INSERT INTO {self._database}.{table_name} ({', '.join(columns)}) VALUES ({', '.join(placeholders)})"
         try:
-            self.run_query(sql, values, fetch = False)
+            self.run_query(sql, values, fetch=False)
         except IntegrityError as e:
             print("THERE WAS AN INTEGRITY ERROR", e)
             return 0
