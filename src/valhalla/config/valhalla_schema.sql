@@ -14,10 +14,9 @@ create table if not exists personal.valhalla_secrets
     created_at        timestamp default CURRENT_TIMESTAMP null,
     updated_at        timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
     last_accessed     timestamp                           null,
-    id                int       default 1                 not null
+    id                int auto_increment
         primary key,
     valhalla_username varchar(64)                         not null,
     constraint valhalla_secrets_auth_user_null_fk
         foreign key (valhalla_username) references personal.valhalla_warriors (username)
 );
-
