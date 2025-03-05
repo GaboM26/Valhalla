@@ -70,10 +70,14 @@ class TestCryptoClient(unittest.TestCase):
         self.assertTrue(result)
 
     
-    def test_encrypt_returns_bytes(self):
+    def test_encrypt_returns_str(self):
         plaintext = 'test'
         ciphertext = self.client.encrypt('password', plaintext)
-        self.assertIsInstance(ciphertext, int)
+        self.assertIsInstance(ciphertext, str)
+        try:
+            int(ciphertext)
+        except ValueError:
+            self.fail("ciphertext is not converted to int properly")
 
 
 if __name__ == "__main__":

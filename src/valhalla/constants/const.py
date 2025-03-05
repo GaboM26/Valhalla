@@ -20,3 +20,10 @@ AVAILABLE_CRYPTO_TOOLS = [
     ENCRYPTOR,
     DECRYPTOR
 ]
+
+# Secrets Fields
+SECRETS_TABLE_NAME = 'valhalla_secrets'
+APPNAME_FIELD = 'app_name'
+USERNAME_FIELD = 'username'
+PASSWORD_FIELD = 'password'
+VALHALLA_USERNAME_FIELD = 'valhalla_username'

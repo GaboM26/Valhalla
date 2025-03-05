@@ -8,6 +8,11 @@ from src.valhalla.constants.menu_options import (
     VALHALLA_CREDITS,
     ODIN_PERMISSIONS
 )
+from src.valhalla.constants.const import (
+    SECRETS_TABLE_NAME
+)
+import getpass
+from src.valhalla.utils.payload_builder import PayloadBuilder
 
 class MenuClient:
 
@@ -15,6 +20,7 @@ class MenuClient:
         self._username, self._password = credentials
         self._sql_client = sql_client
         self._crypto_tools = crypto_tools
+        self._payload_builder = PayloadBuilder()
 
     def run(self):
         self.welcome_message()
@@ -39,7 +45,22 @@ class MenuClient:
             print(f"Invalid option: {e}")
 
     def new_entry(self):
-        print("Executing new_entry method")
+        app_name = input("Enter the app name (i.e Facebook): ")
+
+        # TODO: add check for already existing app name, ask if update or not
+
+        username = input("Enter the username (i.e gabo_m26): ")
+        password = getpass.getpass("Enter the password: ")
+        app_name_enc = self._crypto_tools.encrypt(self._password, app_name)
+        username_enc = self._crypto_tools.encrypt(self._password, username)
+        password_enc = self._crypto_tools.encrypt(self._password, password)
+        
+        self._sql_client.insert_row_table(SECRETS_TABLE_NAME, 
+                                          self._payload_builder.build(SECRETS_TABLE_NAME)(app_name_enc, 
+                                                                                          username_enc, 
+                                                                                          password_enc,
+                                                                                          self._username))
+        print("New entry added successfully")
 
     def view_accounts(self):
         print("Executing view_accounts method")

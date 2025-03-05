@@ -76,7 +76,7 @@ class CryptoClient:
         except RuntimeError as e:
             print(f"Error executing encrypt: {e}", file=sys.stderr)
             return None
-        return int.from_bytes(ciphertext.stdout, 'little')
+        return str(int.from_bytes(ciphertext.stdout, 'little'))
 
     def decrypt(self, password:str, ciphertext:str):
         pass

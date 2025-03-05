@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from src.valhalla.clients.driver_client import DriverClient
 from src.valhalla.utils.exceptions.unauthorized_user_error import UnauthorizedUserError
+from src.valhalla.utils.payload_builder import PayloadBuilder
 from src.valhalla.clients.mysql_client import PyMySqlClient
 from src.valhalla.clients.crypto_client import CryptoClient
 from src.valhalla.clients.menu_client import MenuClient
