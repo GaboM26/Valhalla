@@ -110,7 +110,7 @@ class PyMySqlClient:
             return 0
         return 1
 
-    def retrieve(self, table_name, field_list = [], query_dict = {}):
+    def retrieve(self, table_name, field_list=[], query_dict={}):
         """
         Maps a query on a resource collection to an SQL statement and returns the result.
 
@@ -124,8 +124,7 @@ class PyMySqlClient:
         if not field_list:
             field_list = ['*']
 
-        # Build the SELECT statement
-        sql = "SELECT " + ", ".join(field_list) + f" FROM {self._database}.{table_name}"
+        sql = f"SELECT {', '.join(field_list)} FROM {self._database}.{table_name}"
         args = []
 
         # Build the WHERE clause if query_dict is provided
