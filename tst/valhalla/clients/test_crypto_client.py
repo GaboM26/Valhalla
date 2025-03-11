@@ -78,6 +78,13 @@ class TestCryptoClient(unittest.TestCase):
             int(ciphertext)
         except ValueError:
             self.fail("ciphertext is not converted to int properly")
+    
+    def test_decrypt_returns_str(self):
+        plaintext = 'test'
+        ciphertext = self.client.encrypt('password', plaintext)
+        decrypted = self.client.decrypt('password', ciphertext)
+        self.assertIsInstance(decrypted, str)
+        self.assertEqual(plaintext, decrypted)
 
 
 if __name__ == "__main__":

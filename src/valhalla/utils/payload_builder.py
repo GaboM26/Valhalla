@@ -35,3 +35,15 @@ class PayloadBuilder:
             PASSWORD_FIELD: password,
             VALHALLA_USERNAME_FIELD: valhalla_username
         }
+    
+    def get_encrypted_columns(self, table_name):
+        switch = {
+            SECRETS_TABLE_NAME: [APPNAME_FIELD, USERNAME_FIELD, PASSWORD_FIELD]
+        }
+
+        retval = switch.get(table_name, None)
+
+        if(retval is None):
+            raise NotImplementedError(f"Table {table_name} not recognized, can't build payload")
+        
+        return retval

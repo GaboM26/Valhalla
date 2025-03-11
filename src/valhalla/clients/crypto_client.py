@@ -2,6 +2,8 @@ import os
 import sys
 import subprocess
 import shutil
+import pandas
+import tempfile
 
 from src.valhalla.constants.const import (
     CRYPTO_TOOLS_PATH,
@@ -15,6 +17,8 @@ from src.valhalla.utils.exceptions.missing_dependencies_error import (
     FailedExecutionError,
     MissingDependenciesError
 )
+from src.valhalla.utils.payload_builder import PayloadBuilder
+from src.valhalla.utils.misc import int_str_to_bytes
 # Odin - the allfather that can see it all will determine
 # if you are worthy of the passwords or not. Only the allfather,
 # with a password only he knows, will be able to check
@@ -78,21 +82,31 @@ class CryptoClient:
             return None
         return str(int.from_bytes(ciphertext.stdout, 'little'))
 
-    def decrypt(self, password:str, ciphertext:str):
-        pass
-        # try:
-        #     decrypt_cmd_path = os.path.join('.', ENCRYPTOR)
-        #     print(decrypt_cmd_path)
-        #     plaintext = subprocess.run([decrypt_cmd_path, '-i', ciphertext, 'stdout', '-p', password], 
-        #                             cwd=self._tools_path,
-        #                             capture_output=True, 
-        #                             text=True, 
-        #                             check=True
-        #                         )
-        # except RuntimeError as e:
-        #     print(f"Error executing decrypt: {e}", file=sys.stderr)
-        #     return None
-#        return plaintext.stdout
+    def decrypt(self, password:str, ciphertext_raw_num:str) -> str:
+        try:
+            decrypt_cmd_path = os.path.join('.', DECRYPTOR)
+            ciphertext = int_str_to_bytes(ciphertext_raw_num)
+
+            # Write the bytes to a temporary file
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                temp_file.write(ciphertext)
+                temp_file_path = temp_file.name
+
+            plaintext = subprocess.run([decrypt_cmd_path, temp_file_path, 'stdout', '-p', password], 
+                                    cwd=self._tools_path,
+                                    capture_output=True, 
+                                    text=True, 
+                                    check=True
+                                )
+        except RuntimeError as e:
+            print(f"Error executing decrypt: {e}", file=sys.stderr)
+            return None
+        finally:
+            # Clean up the temporary file
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
+
+        return plaintext.stdout
 
     def prepare_tools(self, project_root):
         honir_path = os.path.join(project_root, HONIR_REL_PATH)
@@ -134,3 +148,8 @@ class CryptoClient:
             print(f"Directory created: {directory_path}")
         else:
             print(f"Directory already exists: {directory_path}")
+    
+    def decrypt_secrets_df(self, df:pandas.DataFrame, table_name:str, password:str):
+        pb = PayloadBuilder()
+        df[pb.get_encrypted_columns(table_name)] = df[pb.get_encrypted_columns(table_name)].map(lambda x: self.decrypt(password, x))
+        return df

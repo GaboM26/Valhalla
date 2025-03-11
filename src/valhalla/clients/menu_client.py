@@ -13,6 +13,8 @@ from src.valhalla.constants.const import (
 )
 import getpass
 from src.valhalla.utils.payload_builder import PayloadBuilder
+from tabulate import tabulate
+import pandas
 
 class MenuClient:
 
@@ -68,8 +70,17 @@ class MenuClient:
 
     def view_accounts(self):
         print("Viewed accounts successfully")
-        # self._sql_client.retrieve(SECRETS_TABLE_NAME,
-        #                          self._payload_builder.build(SECRETS_TABLE_NAME))
+        where_clause = {
+            'valhalla_username': self._username
+        }
+        sql_data = self._sql_client.retrieve(SECRETS_TABLE_NAME,
+                                 query_dict = where_clause)
+        # TODO: It may be a good idea to cache it in order to use the get_entry method later
+        df = pandas.DataFrame(sql_data)
+
+        unencrypted_df = self._crypto_tools.decrypt_secrets_df(df, SECRETS_TABLE_NAME, self._password)
+        print(unencrypted_df)
+
     
     def get_entry(self):
         print("Executing get_entry method")
