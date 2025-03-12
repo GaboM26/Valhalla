@@ -9,7 +9,8 @@ from src.valhalla.constants.menu_options import (
     ODIN_PERMISSIONS
 )
 from src.valhalla.constants.const import (
-    SECRETS_TABLE_NAME
+    SECRETS_TABLE_NAME,
+    VALHALLA_USERNAME_FIELD
 )
 import getpass
 from src.valhalla.utils.payload_builder import PayloadBuilder
@@ -69,16 +70,22 @@ class MenuClient:
         print("New entry added successfully")
 
     def view_accounts(self):
-        print("Viewed accounts successfully")
         where_clause = {
-            'valhalla_username': self._username
+            VALHALLA_USERNAME_FIELD: self._username
         }
+
         sql_data = self._sql_client.retrieve(SECRETS_TABLE_NAME,
-                                 query_dict = where_clause)
+                            field_list = self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME),
+                            query_dict = where_clause)
         # TODO: It may be a good idea to cache it in order to use the get_entry method later
         df = pandas.DataFrame(sql_data)
 
-        unencrypted_df = self._crypto_tools.decrypt_secrets_df(df, SECRETS_TABLE_NAME, self._password)
+        unencrypted_df = self._crypto_tools.decrypt_df(
+            df,
+            SECRETS_TABLE_NAME,
+            self._password, 
+            self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME)
+        ) 
         print(unencrypted_df)
 
     

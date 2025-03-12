@@ -149,7 +149,6 @@ class CryptoClient:
         else:
             print(f"Directory already exists: {directory_path}")
     
-    def decrypt_secrets_df(self, df:pandas.DataFrame, table_name:str, password:str):
-        pb = PayloadBuilder()
-        df[pb.get_encrypted_columns(table_name)] = df[pb.get_encrypted_columns(table_name)].map(lambda x: self.decrypt(password, x))
+    def decrypt_df(self, df:pandas.DataFrame, table_name:str, password:str, encrypted_columns:list) -> pandas.DataFrame:
+        df[encrypted_columns] = df[encrypted_columns].map(lambda x: self.decrypt(password, x))
         return df
