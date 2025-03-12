@@ -10,7 +10,8 @@ from src.valhalla.constants.menu_options import (
 )
 from src.valhalla.constants.const import (
     SECRETS_TABLE_NAME,
-    VALHALLA_USERNAME_FIELD
+    VALHALLA_USERNAME_FIELD,
+    APPNAME_FIELD
 )
 import getpass
 from src.valhalla.utils.payload_builder import PayloadBuilder
@@ -75,8 +76,9 @@ class MenuClient:
         }
 
         sql_data = self._sql_client.retrieve(SECRETS_TABLE_NAME,
-                            field_list = self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME),
-                            query_dict = where_clause)
+            field_list = self._payload_builder.get_app_name_list(SECRETS_TABLE_NAME),
+            query_dict = where_clause
+        )
         # TODO: It may be a good idea to cache it in order to use the get_entry method later
         df = pandas.DataFrame(sql_data)
 
@@ -84,12 +86,22 @@ class MenuClient:
             df,
             SECRETS_TABLE_NAME,
             self._password, 
-            self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME)
+            self._payload_builder.get_app_name_list(SECRETS_TABLE_NAME)
         ) 
         print(unencrypted_df)
 
     
     def get_entry(self):
+        account = input("Enter the app you need credentials for: ")
+
+        where_clause = {
+            VALHALLA_USERNAME_FIELD: self._username
+        }
+
+        sql_data = self._sql_client.retrieve(SECRETS_TABLE_NAME,
+                            field_list = self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME),
+                            query_dict = where_clause)
+
         print("Executing get_entry method")
     
     def welcome_message(self):

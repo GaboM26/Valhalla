@@ -47,3 +47,15 @@ class PayloadBuilder:
             raise NotImplementedError(f"Table {table_name} not recognized, can't build payload")
         
         return retval
+    
+    def get_app_name_list(self, table_name):
+        switch = {
+            SECRETS_TABLE_NAME: [APPNAME_FIELD]
+        }
+
+        retval = switch.get(table_name, None)
+
+        if(retval is None):
+            raise NotImplementedError(f"Table {table_name} not recognized, can't build payload")
+        
+        return retval
