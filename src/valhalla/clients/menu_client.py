@@ -98,11 +98,28 @@ class MenuClient:
             VALHALLA_USERNAME_FIELD: self._username
         }
 
-        sql_data = self._sql_client.retrieve(SECRETS_TABLE_NAME,
+        ciphered_sql_data = self._sql_client.retrieve(SECRETS_TABLE_NAME,
                             field_list = self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME),
-                            query_dict = where_clause)
+                            query_dict = where_clause
+                        )
+        
+        if not ciphered_sql_data:
+            print("Valhalla has no records for you yet! Try entering some data first.")
+            return
 
-        print("Executing get_entry method")
+        df = pandas.DataFrame(ciphered_sql_data)
+        unencrypted_df = self._crypto_tools.decrypt_df(
+            df,
+            SECRETS_TABLE_NAME,
+            self._password, 
+            self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME)
+        )
+
+        act = unencrypted_df.loc[unencrypted_df[APPNAME_FIELD] == account]
+        if act.empty:
+            print(f"Valhalla has no knowledge of '{account}'.")
+            return
+        print(act)
     
     def welcome_message(self):
         msg = f'Welcome {self._username} to'
