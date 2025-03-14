@@ -71,13 +71,10 @@ class MenuClient:
         print("New entry added successfully")
 
     def view_accounts(self):
-        where_clause = {
-            VALHALLA_USERNAME_FIELD: self._username
-        }
 
         sql_data = self._sql_client.retrieve(SECRETS_TABLE_NAME,
             field_list = self._payload_builder.get_app_name_list(SECRETS_TABLE_NAME),
-            query_dict = where_clause
+            query_dict = self._payload_builder.get_valhalla_where_user_payload(self._username)
         )
         # TODO: It may be a good idea to cache it in order to use the get_entry method later
         df = pandas.DataFrame(sql_data)
@@ -94,13 +91,9 @@ class MenuClient:
     def get_entry(self):
         account = input("Enter the app you need credentials for: ")
 
-        where_clause = {
-            VALHALLA_USERNAME_FIELD: self._username
-        }
-
         ciphered_sql_data = self._sql_client.retrieve(SECRETS_TABLE_NAME,
                             field_list = self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME),
-                            query_dict = where_clause
+                            query_dict = self._payload_builder.get_valhalla_where_user_payload(self._username)
                         )
         
         if not ciphered_sql_data:

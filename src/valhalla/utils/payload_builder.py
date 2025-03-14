@@ -59,3 +59,10 @@ class PayloadBuilder:
             raise NotImplementedError(f"Table {table_name} not recognized, can't build payload")
         
         return retval
+    
+    def get_valhalla_where_user_payload(self, username):
+
+        where_clause = {
+            VALHALLA_USERNAME_FIELD: username
+        }
+        return where_clause
