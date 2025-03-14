@@ -121,6 +121,12 @@ class MenuClient:
             return
         print(act)
     
+    def update_entry(self):
+        pass
+
+    def delete_entry(self):
+        pass
+    
     def welcome_message(self):
         msg = f'Welcome {self._username} to'
         print(msg, end='', flush=True)
