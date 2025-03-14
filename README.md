@@ -35,6 +35,17 @@ aes is utilized as the encryption standard of choice.
     git update-index --no-assume-unchanged src/valhalla/config/secrets.yaml
     ```
 
+### Installing MySql
+I recommend following the instructions on the official MySQL website to install MySQL on your machine.
+[MySQL Installation Guide](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/)
+
+If you will be using wsl, here is a quick guide to use mysql in your windows machine from wsl: https://dev.to/qviper/connecting-mysql-server-in-windows-machine-from-wsl-4pf1
+
+To find the host, localhost may not suffice. Try running the below command to find the equivalent to localhost on wsl:
+```sh
+ip route show | grep -i default | awk '{ print $3}'
+```
+
 ## Usage
 1. Set up your MySQL database and configure the connection settings.
 2. Run the main script to start interacting with the database:
