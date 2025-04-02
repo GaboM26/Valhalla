@@ -66,3 +66,10 @@ class PayloadBuilder:
             VALHALLA_USERNAME_FIELD: username
         }
         return where_clause
+    
+    def get_valhalla_where_id_payload(self, id):
+
+        where_clause = {
+            ID: id
+        }
+        return where_clause

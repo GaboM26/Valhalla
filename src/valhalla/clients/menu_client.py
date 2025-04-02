@@ -11,10 +11,15 @@ from src.valhalla.constants.menu_options import (
 from src.valhalla.constants.const import (
     SECRETS_TABLE_NAME,
     VALHALLA_USERNAME_FIELD,
+    ID,
     APPNAME_FIELD
 )
 import getpass
 from src.valhalla.utils.payload_builder import PayloadBuilder
+from src.valhalla.utils.misc import (
+    pretty_print_flat_dict,
+    clean_nested_dict
+)
 from tabulate import tabulate
 import pandas
 
@@ -115,7 +120,86 @@ class MenuClient:
         print(act)
     
     def update_entry(self):
-        pass
+        account = input("Enter the app name you want to update (--ls to view accounts): ")
+
+        if(account == "--ls"):
+            self.view_accounts()
+            account = input("Enter the app name you want to update: ")
+        
+        self.__update_entry_helper(account)
+    
+    # performs the update entry process
+    def __update_entry_helper(self, account: str):
+        # Retrieve the encrypted data for the user
+        ciphered_sql_data = self._sql_client.retrieve(
+            SECRETS_TABLE_NAME,
+            query_dict = self._payload_builder.get_valhalla_where_user_payload(self._username)
+        )
+
+        if not ciphered_sql_data:
+            print("Valhalla has no records for you yet! Try entering some data first.")
+            return
+
+        # Decrypt the data
+        df = pandas.DataFrame(ciphered_sql_data)
+        unencrypted_df = self._crypto_tools.decrypt_df(
+            df,
+            SECRETS_TABLE_NAME,
+            self._password,
+            self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME)
+        )
+
+        # Check if the account exists
+        act = unencrypted_df.loc[unencrypted_df[APPNAME_FIELD] == account]
+
+        if act.empty:
+            print(f"Valhalla has no knowledge of '{account}'. You can add it using the new_entry option.")
+            return
+        
+        # filter only relevant fields
+        change_fields = act[self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME)]
+        # Build the update payload
+        update_payload = self.__get_update_fields(clean_nested_dict(change_fields.to_dict()))
+
+        if not update_payload:
+            print("Valhalla can't update data without your input!")
+            return
+
+        # Perform the update
+        self._sql_client.update_entry(
+            SECRETS_TABLE_NAME,
+            update_values=update_payload,
+            old_values=self._payload_builder.get_valhalla_where_id_payload(act[ID].iloc[0])
+        )
+
+        print(f"Entry for '{account}' updated successfully.")
+
+    def __get_update_fields(self, account: dict):
+        print("select the fields you want to update (press Enter when done):")
+
+        while True:
+            print("Current details:")
+            pretty_print_flat_dict(account)
+            field = input("Enter the field name you want to update (q when done): ")
+            if field == 'q':
+                break
+            if field not in account:
+                print(f"Field '{field}' not found in the account details.")
+                continue
+            new_value = input(f"Enter the new value for '{field}': ")
+            if not new_value:
+                print("Empty values are not allowed.")
+                continue
+            # Update the account dictionary
+            account[field] = new_value
+        
+        # Encrypt the updated values
+        for key in account.keys():
+            if key in self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME):
+                account[key] = self._crypto_tools.encrypt(self._password, account[key])
+
+        return account
+
 
     def delete_entry(self):
         pass

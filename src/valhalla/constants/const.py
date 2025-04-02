@@ -23,6 +23,7 @@ AVAILABLE_CRYPTO_TOOLS = [
 
 # Secrets Fields
 SECRETS_TABLE_NAME = 'valhalla_secrets'
+ID = 'id'
 APPNAME_FIELD = 'app_name'
 USERNAME_FIELD = 'username'
 PASSWORD_FIELD = 'password'
