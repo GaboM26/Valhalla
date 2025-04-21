@@ -14,6 +14,7 @@ from src.valhalla.constants.const import (
     ID,
     APPNAME_FIELD
 )
+import traceback
 import getpass
 from src.valhalla.utils.payload_builder import PayloadBuilder
 from src.valhalla.utils.misc import (
@@ -51,7 +52,9 @@ class MenuClient:
             method = getattr(self, option)
             method()
         except (KeyError, AttributeError, ValueError) as e:
+            print("HERE")
             print(f"Invalid option: {e}")
+            traceback.print_exc()
 
     def new_entry(self):
         app_name = input("Enter the app name (i.e Facebook): ")
@@ -159,17 +162,18 @@ class MenuClient:
         # filter only relevant fields
         change_fields = act[self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME)]
         # Build the update payload
-        update_payload = self.__get_update_fields(clean_nested_dict(change_fields.to_dict()))
+        old_values = clean_nested_dict(change_fields.to_dict())
+        update_payload = self.__get_update_fields(old_values)
 
         if not update_payload:
             print("Valhalla can't update data without your input!")
             return
-
         # Perform the update
         self._sql_client.update_entry(
             SECRETS_TABLE_NAME,
             update_values=update_payload,
-            old_values=self._payload_builder.get_valhalla_where_id_payload(act[ID].iloc[0])
+            old_values=old_values,
+            pk_vals = self._payload_builder.get_valhalla_where_id_payload(act[ID].values[0])
         )
 
         print(f"Entry for '{account}' updated successfully.")
@@ -193,12 +197,13 @@ class MenuClient:
             # Update the account dictionary
             account[field] = new_value
         
+        res = {}
         # Encrypt the updated values
         for key in account.keys():
             if key in self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME):
-                account[key] = self._crypto_tools.encrypt(self._password, account[key])
+                res[key] = self._crypto_tools.encrypt(self._password, account[key])
 
-        return account
+        return res
 
 
     def delete_entry(self):

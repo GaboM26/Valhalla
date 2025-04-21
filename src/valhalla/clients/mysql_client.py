@@ -158,7 +158,7 @@ class PyMySqlClient:
         where_clause = where_clause[:len(where_clause)-len(" AND")]
         return (pk_vals, where_clause)
 
-    def update_entry(self, table_name, update_values, old_values):
+    def update_entry(self, table_name, update_values, old_values, pk_vals = {}):
         """
         Update rows in a given table with new values.
 
@@ -185,15 +185,14 @@ class PyMySqlClient:
         set_clause = set_clause[:len(set_clause)-len(", ")] + " WHERE"
 
         # Construct the WHERE clause based on old_values
-        pk_vals, where_clause = self.build_where_clause_pk(table_name, old_values)
+        values = pk_vals if len(pk_vals) > 0 else old_values
+        pk_vals, where_clause = self.build_where_clause_pk(table_name, values)
 
         # Combine update_values and old_values for execution
         combined_values = upd_list + pk_vals
             
         # Construct the full UPDATE statement
         sql = f"UPDATE {table_name} SET {set_clause} {where_clause}"
-        print(sql)
-        print(combined_values)
         
         try:
             self.run_query(sql, combined_values, fetch=False)
