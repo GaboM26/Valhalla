@@ -160,6 +160,7 @@ class MenuClient:
             return
         
         # filter only relevant fields
+        # TODO: Maybe not needed, I believe get_encrypted_columns already does this
         change_fields = act[self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME)]
         # Build the update payload
         old_values = clean_nested_dict(change_fields.to_dict())
@@ -207,7 +208,39 @@ class MenuClient:
 
 
     def delete_entry(self):
-        pass
+        account = input("Enter the app you wish to exile to Hel: ")
+
+        ciphered_sql_data = self._sql_client.retrieve(SECRETS_TABLE_NAME,
+                            query_dict = self._payload_builder.get_valhalla_where_user_payload(self._username)
+                        )
+        
+        if not ciphered_sql_data:
+            print("Valhalla has no records for you yet! Try entering some data first.")
+            return
+
+        df = pandas.DataFrame(ciphered_sql_data)
+        unencrypted_df = self._crypto_tools.decrypt_df(
+            df,
+            SECRETS_TABLE_NAME,
+            self._password, 
+            self._payload_builder.get_encrypted_columns(SECRETS_TABLE_NAME)
+        )
+
+        act = unencrypted_df.loc[unencrypted_df[APPNAME_FIELD] == account]
+        if act.empty:
+            print(f"Valhalla has no knowledge of '{account}'.")
+            return
+        
+        
+        # Perform the delete
+        self._sql_client.delete_row(
+            SECRETS_TABLE_NAME,
+            self._payload_builder.get_valhalla_where_id_payload(act[ID].values[0])
+        )
+
+        print(f"Entry for '{account}' exiled to Hel succesfully!")
+        
+    
     
     def welcome_message(self):
         msg = f'Welcome {self._username} to'
